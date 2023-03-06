@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "args": [
+        "${file}",
+        "-s"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src:${workspaceFolder}/tests"
+      },
+      "justMyCode": true,
+      "module": "pytest",
+      "name": "Python: Current file",
+      "request": "launch",
+      "type": "python"
+    }
+  ],
+  "version": "0.2.0"
+}

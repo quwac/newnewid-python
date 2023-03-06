@@ -1,0 +1,43 @@
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core"]
+
+[tool.black]
+line-length = 100
+
+[tool.flake8]
+enable-extensions = "B1"
+enable-extra-whitelist = true
+exclude = ".git,__pycache__,.venv,.pytest_cache,env,tests"
+ignore = "ANN002,ANN003,ANN101,ANN102,ANN202,ANN204,D100,D104,E501,FNE007,H301,SIM106,W503"
+ignore-decorators = "nodoc"
+ignore-self-only-init = true
+max-line-length = 100
+max-parameters-amount = 3
+max_returns_amount = 2
+suppress-none-returning = true
+warn-symbols = 'obsolete_module=Warning!\nmodule.obsolete_function=Warning!'
+
+[tool.isort]
+profile = "black"
+
+[tool.poetry]
+authors = ["quwac <53551867+quwac@users.noreply.github.com>"]
+description = ""
+name = "newnewid"
+packages = [{from = "src", include = "newnewid"}]
+readme = "README.md"
+version = "0.2.0"
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+
+[tool.poetry.group.dev.dependencies]
+flake8-docstrings = "^1.7.0"
+pre-commit = "^3.2.2"
+pyproject-flake8 = "^6.0.0.post1"
+pytest = "^7.2.2"
+
+[tool.poetry.scripts]
+newnewid = "newnewid.cli:generate_uuid"
+uuidparse = "newnewid.cli:parse_uuid"
