@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "newuuid"
+version = "0.1.0"
+description = ""
+authors = ["quwac <53551867+quwac@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "newuuid", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.8.1"
+
+[tool.poetry.group.dev.dependencies]
+pyproject-flake8 = "^6.0.0.post1"
+pytest = "^7.2.2"
+uuid6 = "^2022.10.25"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+
+[tool.flake8]
+enable-extensions = "B1"
+enable-extra-whitelist = true
+exclude = ".git,__pycache__,.venv,.pytest_cache,env"
+ignore = "ANN002,ANN003,ANN101,ANN102,ANN202,ANN204,E501,FNE007,H301,SIM106,W503"
+max-line-length = 100
+max-parameters-amount = 3
+max_returns_amount = 2
+suppress-none-returning = true
+warn-symbols = 'obsolete_module=Warning!\nmodule.obsolete_function=Warning!'
+
+[tool.poetry.scripts]
+newuuid = "newuuid.cli:main"
+uuidparse = "newuuid.cli:parse_uuid"
