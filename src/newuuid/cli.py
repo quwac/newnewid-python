@@ -12,35 +12,64 @@ from newuuid import (
     uuid5,
     uuid6,
     uuid7,
+    uuid8,
 )
 
 
-def generate():
+def generate_uuid():
     parser = argparse.ArgumentParser(description="Generate UUID")
     parser.add_argument(
-        "n", type=int, nargs="?", help="Number of UUIDs to generate. example: 10", default=1
+        "n", type=int, nargs="?", help="Number of UUIDs to generate. example: 10", default=7
     )
     parser.add_argument(
-        "u", type=str, nargs="?", help="Version of UUID. 1, 3, 4, 5, 6, 7, nil or max", default="7"
+        "-u",
+        "--uuid-version",
+        type=str,
+        nargs="?",
+        help="Version of UUID. 1, 3, 4, 5, 6, 7, 8, nil or max",
+        default="7",
     )
     parser.add_argument(
-        "namespace",
+        "--namespace",
         type=str,
         nargs="?",
         help="Namespace for UUIDv3 or UUIDv5. example: '0186b748-053d-7c24-be59-de03734bb9ab'",
+        default=None,
     )
     parser.add_argument(
-        "name",
+        "--name",
         type=str,
         nargs="?",
         help="Name for UUIDv3 or UUIDv5. example: 'name'",
-        default="name",
+        default=None,
+    )
+    parser.add_argument(
+        "--custom-a",
+        type=int,
+        nargs="?",
+        help="cuatom-a binary for UUIDv8.",
+        default=None,
+    )
+    parser.add_argument(
+        "--custom-b",
+        type=int,
+        nargs="?",
+        help="cuatom-b binary for UUIDv8.",
+        default=None,
+    )
+    parser.add_argument(
+        "--custom-c",
+        type=int,
+        nargs="?",
+        help="cuatom-c binary for UUIDv8.",
+        default=None,
     )
     args = parser.parse_args()
 
     # --------------------------------------------------------------------------------
 
-    uuid_version = args.u
+    print(f"args: {args}")
+    uuid_version = args.uuid_version
 
     if uuid_version == "1":
 
@@ -50,22 +79,41 @@ def generate():
         uuid_module = uuid1_wrapper
     elif uuid_version == "3":
 
+        namespace = args.namespace
+        name = args.name
+        if namespace is None or name is None:
+            raise ValueError("namespace and name are required for UUIDv3")
+
         def uuid3_wrapper():
-            return uuid3(UUID(args.u), args.a)
+            return uuid3(UUID(namespace), name)
 
         uuid_module = uuid3_wrapper
     elif uuid_version == "4":
         uuid_module = uuid4
     elif uuid_version == "5":
 
+        namespace = args.namespace
+        name = args.name
+        if namespace is None or name is None:
+            raise ValueError("namespace and name are required for UUIDv5")
+
         def uuid5_wrapper():
-            return uuid5(UUID(args.u), args.a)
+            return uuid5(UUID(namespace), name)
 
         uuid_module = uuid5_wrapper
     elif uuid_version == "6":
         uuid_module = uuid6
     elif uuid_version == "7":
         uuid_module = uuid7
+    elif uuid_version == "8":
+
+        if args.custom_a is None or args.custom_b is None or args.custom_c is None:
+            raise ValueError("custom-a, custom-b and custom-c are required for UUIDv8")
+
+        def uuid8_wrapper():
+            return uuid8(args.custom_a, args.custom_b, args.custom_c)
+
+        uuid_module = uuid8_wrapper
     elif uuid_version == "nil":
         uuid_module = nil_uuid
     elif uuid_version == "max":
@@ -88,4 +136,5 @@ def parse_uuid():
     uuids: List[str] = args.uuid
 
     for uuid in uuids:
-        print(parse(UUID(uuid)))
+        obj = {**{"uuid": uuid}, **parse(UUID(uuid))}
+        print(obj)

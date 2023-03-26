@@ -102,7 +102,7 @@ class UUID7Generator(ClockBasedUUIDGenerator):
             "rand_a": rand_a,
             "var": variant,
             "rand_b": rand_b,
-            "time": time,
+            "time": time.isoformat(),
             "seq": f"{seq}({hex(seq) if seq is not None else 'None'})",
             "rand": f"{rand}({hex(rand) if rand is not None else 'None'})",
         }

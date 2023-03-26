@@ -94,13 +94,13 @@ class UUID6Generator(ClockBasedUUIDGenerator):
         return {
             "time_high": time_high,
             "time_mid": time_mid,
-            "ver": version,
+            "ver": str(version),
             "time_low": time_low,
             "variant": variant,
-            "clock_seq": f"{clock_seq}({hex(clock_seq)})",
+            "clock_seq": clock_seq,
             "node": node,
             "gregorian_100_nano_seconds": gregorian_100_nano_seconds,
-            "time": time,
+            "time": time.isoformat(),
             "epoch_nano_fraction": epoch_nano_fraction,
         }
 

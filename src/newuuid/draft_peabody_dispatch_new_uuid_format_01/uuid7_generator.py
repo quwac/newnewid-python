@@ -208,7 +208,7 @@ class UUID7Generator(ClockBasedUUIDGenerator):
                 "seq": seq,
                 "variant": variant,
                 "rand": rand,
-                "time": time,
+                "time": time.isoformat(),
             }
         elif precision == "micro":
             usec_a = (uuid.int >> 80) & 0x0FFF
@@ -227,7 +227,7 @@ class UUID7Generator(ClockBasedUUIDGenerator):
                 "usec_b": usec_b,
                 "variant": variant,
                 "rand": rand,
-                "time": time,
+                "time": time.isoformat(),
             }
         else:
             nsec_a = (uuid.int >> 80) & 0x0FFF
@@ -247,9 +247,9 @@ class UUID7Generator(ClockBasedUUIDGenerator):
                 "nsec_b": nsec_b,
                 "variant": variant,
                 "nsec_c": nsec_c,
-                "seq": f"{seq}({hex(seq)})",
+                "seq": seq,
                 "rand": rand,
-                "time": time,
+                "time": time.isoformat(),
                 "nsec": nsec,
             }
 

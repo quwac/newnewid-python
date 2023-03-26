@@ -1,4 +1,5 @@
 # noqa: E401
+import importlib
 from typing import Literal
 
 UUIDSpec = Literal[
@@ -15,54 +16,20 @@ UUIDSpec = Literal[
 
 def load_modules(spec: UUIDSpec = "latest"):
     if spec == "draft_peabody_dispatch_new_uuid_format_01":
-        from newuuid.draft_peabody_dispatch_new_uuid_format_01 import (  # noqa: E401
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_peabody_dispatch_new_uuid_format_01")
     elif spec == "draft_peabody_dispatch_new_uuid_format_02":
-        from newuuid.draft_peabody_dispatch_new_uuid_format_02 import (  # noqa: E401
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_peabody_dispatch_new_uuid_format_02")
     elif spec == "draft_peabody_dispatch_new_uuid_format_03":
-        from newuuid.draft_peabody_dispatch_new_uuid_format_03 import (  # noqa: E401
-            MaxUUIDGenerator,
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_peabody_dispatch_new_uuid_format_03")
     elif spec == "draft_peabody_dispatch_new_uuid_format_04":
-        from newuuid.draft_peabody_dispatch_new_uuid_format_04 import (  # noqa: E401
-            MaxUUIDGenerator,
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_peabody_dispatch_new_uuid_format_04")
     elif spec == "draft_ietf_uuidrev_rfc4122bis_00":
-        from newuuid.draft_ietf_uuidrev_rfc4122bis_00 import (  # noqa: E401
-            MaxUUIDGenerator,
-            NilUUIDGenerator,
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_ietf_uuidrev_rfc4122bis_00")
     elif spec == "draft_ietf_uuidrev_rfc4122bis_01":
-        from newuuid.draft_ietf_uuidrev_rfc4122bis_01 import (  # noqa: E401
-            MaxUUIDGenerator,
-            NilUUIDGenerator,
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_ietf_uuidrev_rfc4122bis_01")
     elif spec == "draft_ietf_uuidrev_rfc4122bis_02" or spec == "latest":
-        from newuuid.draft_ietf_uuidrev_rfc4122bis_02 import (  # noqa: E401
-            MaxUUIDGenerator,
-            NilUUIDGenerator,
-            UUID6Generator,
-            UUID7Generator,
-            UUID8Generator,
-        )
+        module = importlib.import_module("newuuid.draft_ietf_uuidrev_rfc4122bis_02")
     else:
         raise ValueError(f"Unknown spec: {spec}")
+
+    return module

@@ -33,5 +33,5 @@ suppress-none-returning = true
 warn-symbols = 'obsolete_module=Warning!\nmodule.obsolete_function=Warning!'
 
 [tool.poetry.scripts]
-newuuid = "newuuid.cli:main"
+newuuid = "newuuid.cli:generate_uuid"
 uuidparse = "newuuid.cli:parse_uuid"
