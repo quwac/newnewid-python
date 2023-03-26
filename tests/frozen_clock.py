@@ -5,6 +5,20 @@ from newuuid.clock.uuid_clock import UUIDClock
 
 
 class FrozenClock(UUIDClock):
+    @classmethod
+    def from_datetime(cls, datetime: datetime, nanosecond_fraction: int = 0) -> "FrozenClock":
+        return cls(
+            year=datetime.year,
+            month=datetime.month,
+            day=datetime.day,
+            hour=datetime.hour,
+            minute=datetime.minute,
+            second=datetime.second,
+            microsecond=datetime.microsecond,
+            nanosecond_fraction=nanosecond_fraction,
+            tzinfo=datetime.tzinfo,  # type: ignore
+        )
+
     def __init__(
         self,
         year: int,
