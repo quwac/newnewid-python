@@ -1,10 +1,10 @@
 from typing import Any, Dict
 from uuid import UUID
 
-from newuuid.util.specloader import Spec, load_modules
+from newuuid.util.specloader import UUIDSpec, load_modules
 
 
-def parse(uuid: UUID, spec: Spec = "latest", **kwargs) -> Dict[str, Any]:
+def parse(uuid: UUID, spec: UUIDSpec = "latest", **kwargs) -> Dict[str, Any]:
     uuid_int = uuid.int
     version = int((uuid_int >> 76) & 0xF)
 

@@ -1,7 +1,7 @@
 # noqa: E401
 from typing import Literal
 
-Spec = Literal[
+UUIDSpec = Literal[
     "draft_peabody_dispatch_new_uuid_format_01",
     "draft_peabody_dispatch_new_uuid_format_02",
     "draft_peabody_dispatch_new_uuid_format_03",
@@ -13,7 +13,7 @@ Spec = Literal[
 ]
 
 
-def load_modules(spec: Spec = "latest"):
+def load_modules(spec: UUIDSpec = "latest"):
     if spec == "draft_peabody_dispatch_new_uuid_format_01":
         from newuuid.draft_peabody_dispatch_new_uuid_format_01 import (  # noqa: E401
             UUID6Generator,
