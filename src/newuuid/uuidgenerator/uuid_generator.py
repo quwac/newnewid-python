@@ -18,6 +18,17 @@ class UUIDGenerator(metaclass=ABCMeta):
     def parse(cls, uuid: UUID, **args: Any) -> Dict[str, Any]:
         raise NotImplementedError()
 
+    @classmethod
+    def get_version(cls, uuid: UUID) -> str:
+        uuid_int = uuid.int
+        version = int((uuid_int >> 76) & 0xF)
+        if version == 0:
+            return "nil"
+        elif version == 0b1111:
+            return "max"
+        else:
+            return str(version)
+
 
 class ClockBasedUUIDGenerator(
     UUIDGenerator,

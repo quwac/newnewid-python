@@ -7,10 +7,10 @@ from newuuid.random.pseudo_random_generator import PseudoRandomGenerator
 from newuuid.sequence.sequencer import Sequencer
 from newuuid.uuidgenerator.uuid_generator import ClockBasedUUIDGenerator
 
-DEFAULT_SEQ_BITS = 12
-
 
 class UUID7Generator(ClockBasedUUIDGenerator):
+    DEFAULT_SEQ_BITS = 12
+
     def __init__(
         self,
         seq_bits: int,
@@ -44,6 +44,25 @@ class UUID7Generator(ClockBasedUUIDGenerator):
     @property
     def least_seconds(self) -> float:
         return 0.001
+
+    def generate(self) -> UUID:
+        """Generate UUIDv7.
+
+
+         0                   1                   2                   3
+         0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                           unix_ts_ms                          |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |          unix_ts_ms           |  ver  |       rand_a          |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |var|                        rand_b                             |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        |                            rand_b                             |
+        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+        """
+        return super().generate()
 
     def generate_impl(self, timestamp: int) -> UUID:
         # 48 bits
@@ -128,7 +147,7 @@ class UUID7Generator(ClockBasedUUIDGenerator):
 _seq_bits_to_uuid7_generator: Dict[int, UUID7Generator] = {}
 
 
-def uuid7(seq_bits: int = DEFAULT_SEQ_BITS) -> UUID:
+def uuid7(seq_bits: int = UUID7Generator.DEFAULT_SEQ_BITS) -> UUID:
     if seq_bits not in _seq_bits_to_uuid7_generator:
         _seq_bits_to_uuid7_generator[seq_bits] = UUID7Generator(seq_bits)
     uuid7_generator = _seq_bits_to_uuid7_generator[seq_bits]

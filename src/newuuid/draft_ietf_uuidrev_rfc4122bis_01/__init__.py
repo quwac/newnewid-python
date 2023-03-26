@@ -43,6 +43,7 @@ from newuuid.parser.uuid_parser import parse as base_parse
 from newuuid.random.pseudo_random_generator import PseudoRandomGenerator
 from newuuid.sequence.sequencer import Sequencer
 from newuuid.util.specloader import UUIDSpec
+from newuuid.uuidgenerator.uuid_generator import UUIDGenerator
 
 
 def parse(
@@ -69,6 +70,7 @@ __all__ = [
     "uuid4",
     "uuid5",
     # New UUID
+    "UUIDGenerator",
     "max_uuid",
     "MaxUUIDGenerator",
     "nil_uuid",

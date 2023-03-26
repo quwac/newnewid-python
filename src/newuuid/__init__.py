@@ -33,6 +33,7 @@ from newuuid.exception.backward_uuid_exception import BackwardUUIDException
 from newuuid.parser.uuid_parser import parse
 from newuuid.random.pseudo_random_generator import PseudoRandomGenerator
 from newuuid.sequence.sequencer import Sequencer
+from newuuid.uuidgenerator.uuid_generator import UUIDGenerator
 
 __all__ = [
     # Compatibility
@@ -52,6 +53,7 @@ __all__ = [
     "uuid4",
     "uuid5",
     # New UUID
+    "UUIDGenerator",
     "max_uuid",
     "MaxUUIDGenerator",
     "nil_uuid",

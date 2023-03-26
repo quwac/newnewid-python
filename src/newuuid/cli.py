@@ -1,8 +1,11 @@
 import argparse
-from typing import List
+import json
+from typing import List, Optional
 
 from newuuid import (
     UUID,
+    UUID7Generator,
+    UUIDGenerator,
     max_uuid,
     nil_uuid,
     parse,
@@ -14,6 +17,11 @@ from newuuid import (
     uuid7,
     uuid8,
 )
+
+
+class Color:
+    YELLOW = "\033[33m"
+    END = "\033[0m"
 
 
 def generate_uuid():
@@ -128,13 +136,30 @@ def generate_uuid():
 def parse_uuid():
     parser = argparse.ArgumentParser(description="Parse UUID")
     parser.add_argument("uuid", nargs="+", type=str, help="UUID")
+    parser.add_argument(
+        "--seq-bits", nargs="?", type=int, help="Sequence bits for UUIDv7", default=None
+    )
 
     args = parser.parse_args()
 
     # --------------------------------------------------------------------------------
 
-    uuids: List[str] = args.uuid
+    uuid_strs: List[str] = args.uuid
+    seq_bits: Optional[int] = args.seq_bits
 
-    for uuid in uuids:
-        obj = {**{"uuid": uuid}, **parse(UUID(uuid))}
-        print(obj)
+    for uuid_str in uuid_strs:
+        uuid = UUID(uuid_str)
+        version = UUIDGenerator.get_version(uuid)
+        if version == "7":
+            if seq_bits is None:
+                print(
+                    Color.YELLOW
+                    + f"[CAUTION] UUIDv7 has 0 - 72 bits of flexibility in the sequence binary length. The default sequence binary length for UUIDv7 created by this library is ${UUID7Generator.DEFAULT_SEQ_BITS} bits, but the sequence binary length for this UUIDv7 may be different. It is recommended to add the seq_bits option to the argument to specify the length explicitly. "
+                    + Color.END
+                )
+                seq_bits = UUID7Generator.DEFAULT_SEQ_BITS
+            parsed = parse(uuid, seq_bits=seq_bits)
+        else:
+            parsed = parse(uuid)
+        obj = {**{"uuid": uuid_str}, **parsed}
+        print(json.dumps(obj))
