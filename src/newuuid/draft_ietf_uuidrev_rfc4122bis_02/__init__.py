@@ -18,16 +18,24 @@ from uuid import (
 )
 
 from newuuid.clock.uuid_clock import UUIDClock
-from newuuid.draft_ietf_uuidrev_rfc4122bis_02 import (
+from newuuid.draft_ietf_uuidrev_rfc4122bis_02.max_uuid_generator import (
     MaxUUIDGenerator,
-    NilUUIDGenerator,
-    UUID6Generator,
-    UUID7Generator,
-    UUID8Generator,
     max_uuid,
+)
+from newuuid.draft_ietf_uuidrev_rfc4122bis_02.nil_uuid_generator import (
+    NilUUIDGenerator,
     nil_uuid,
+)
+from newuuid.draft_ietf_uuidrev_rfc4122bis_02.uuid6_generator import (
+    UUID6Generator,
     uuid6,
+)
+from newuuid.draft_ietf_uuidrev_rfc4122bis_02.uuid7_generator import (
+    UUID7Generator,
     uuid7,
+)
+from newuuid.draft_ietf_uuidrev_rfc4122bis_02.uuid8_generator import (
+    UUID8Generator,
     uuid8,
 )
 from newuuid.exception.backward_uuid_exception import BackwardUUIDException

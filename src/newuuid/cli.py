@@ -73,7 +73,7 @@ def generate():
     else:
         raise ValueError("Invalid version")
 
-    for i in range(args.n):
+    for _ in range(args.n):
         print(uuid_module())
 
 

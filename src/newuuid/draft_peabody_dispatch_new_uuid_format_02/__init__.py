@@ -2,12 +2,16 @@ from typing import Any, Dict
 from uuid import UUID
 
 from newuuid.clock.uuid_clock import UUIDClock
-from newuuid.draft_peabody_dispatch_new_uuid_format_02 import (
+from newuuid.draft_peabody_dispatch_new_uuid_format_02.uuid6_generator import (
     UUID6Generator,
-    UUID7Generator,
-    UUID8Generator,
     uuid6,
+)
+from newuuid.draft_peabody_dispatch_new_uuid_format_02.uuid7_generator import (
+    UUID7Generator,
     uuid7,
+)
+from newuuid.draft_peabody_dispatch_new_uuid_format_02.uuid8_generator import (
+    UUID8Generator,
     uuid8,
 )
 from newuuid.exception.backward_uuid_exception import BackwardUUIDException
