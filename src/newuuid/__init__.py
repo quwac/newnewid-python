@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from uuid import (
     NAMESPACE_DNS,
     NAMESPACE_OID,

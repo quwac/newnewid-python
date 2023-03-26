@@ -30,7 +30,7 @@ class UUIDClock:
         return self.time_ns() // 100 + self.GREGORIAN_OFFSET
 
     # ----------------------------
-    # epoch_seconds_with_*_seconds_fraction
+    # epoch_36_bits_seconds_with_*_bits_*_seconds
     # ----------------------------
 
     def epoch_36_bits_seconds_with_12_bits_milli_seconds(self) -> int:
