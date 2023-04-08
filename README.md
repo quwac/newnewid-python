@@ -46,7 +46,7 @@ uuid8 = newuuid.uuid8(custom_a, custom_b, custom_c)
 print(uuid8)
 ```
 
-# Old draft UUID
+## Old draft UUID
 
 The older versions of the implementation are left for my study.
 
@@ -83,15 +83,15 @@ uuid8 = draft_peabody_dispatch_new_uuid_format_01.uuid8(
 print(f"uuid7_milli={uuid7_milli}, uuid7_micro={uuid7_micro}, uuid7_nano={uuid7_nano}, uuid8={uuid8}")
 ```
 
-# License
+## License
 
 [Unlicense](./LICENSE)
 
-# Reference
+## Reference
 
 * [uuid6/prototypes](https://github.com/uuid6/prototypes)
 
-# Appendix: UUIDv7 >= draft-peabody-dispatch-new-uuid-format-03 implementation
+## Appendix: UUIDv7 >= draft-peabody-dispatch-new-uuid-format-03 implementation
 
 ```text
          0                   1                   2                   3
@@ -117,16 +117,16 @@ If multiple UUIDv7 implementations, each with different counter bit lengths, ind
 Typical bit lengths of the counter are shown below:
 
 * 0 bits: No counter. There will be no graduality for UUIDv7 generated at the same time.
-* 12 bits: The same bit length as the `rand_a` is used for the counter, where X represents the counter portion in the UUID string representation: xxxxxxxx-xxxx-7XXX-xxxx-xxxxxxxxxxxx.
-* 26 bits: The third and fourth parts of the UUID string representation are used for the counter, where X and Y represents the counter part: xxxxxxxx-xxxx-7XXX-YXXX-xxxxxxxxxxxx. Note that Y is limited to c, d, e or f.
-* 42 bits: The bit length used for pseudo-random numbers is exactly 32 bits, where X and Y are counters in the string representation of the UUID. xxxxxxxx-xxxx-7XXX-YXXX-XXXXxxxxxxxx.
+* 12 bits: The same bit length as the `rand_a` is used for the counter, where X represents the counter portion in the UUID string representation: `xxxxxxxx-xxxx-7XXX-xxxx-xxxxxxxxxxxx`.
+* 26 bits: The third and fourth parts of the UUID string representation are used for the counter, where X and Y represents the counter part: `xxxxxxxx-xxxx-7XXX-YXXX-xxxxxxxxxxxx`. Note that Y is limited to c, d, e or f.
+* 42 bits: The bit length used for pseudo-random numbers is exactly 32 bits, where X and Y are counters in the string representation of the UUID: `xxxxxxxx-xxxx-7XXX-YXXX-XXXXxxxxxxxx`.
 * 74 bits: all bits are used for the counter and pseudo-random numbers are not used.
 
 I investigated how many bits each library implementation uses for counters:
 
 | Name                                                                                             | Language   | Counter bits | Counter                         |
 | ------------------------------------------------------------------------------------------------ | ---------- | ------------ | ------------------------------- |
-| [quwac/newuuid6](https://github.com/quwac/newuuid)                                               | Python     | 0 - 74       |
+| **[quwac/newuuid6](https://github.com/quwac/newuuid)**                                           | **Python** | **0 - 74**   |
 | [oittaa/uuid6-python](https://github.com/oittaa/uuid6-python)                                    | Python     | 0            |                                 |
 | [jdknezek/uuid6-zig](https://github.com/jdknezek/uuid6-zig)                                      | Zig        | 0            |                                 |
 | [daegalus/uuid/tree/uuid6](https://github.com/daegalus/dart-uuid)                                | Dart       | 0            |                                 |
