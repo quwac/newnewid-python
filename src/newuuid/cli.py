@@ -52,6 +52,13 @@ def generate_uuid():
         default=None,
     )
     parser.add_argument(
+        "--sequence-bits",
+        type=int,
+        nargs="?",
+        help="sequence-bits for UUIDv7. Default 12",
+        default=12,
+    )
+    parser.add_argument(
         "--custom-a",
         type=int,
         nargs="?",
@@ -76,7 +83,6 @@ def generate_uuid():
 
     # --------------------------------------------------------------------------------
 
-    print(f"args: {args}")
     uuid_version = args.uuid_version
 
     if uuid_version == "1":
@@ -112,7 +118,13 @@ def generate_uuid():
     elif uuid_version == "6":
         uuid_module = uuid6
     elif uuid_version == "7":
-        uuid_module = uuid7
+
+        seq_bits: int = args.sequence_bits
+
+        def uuid7_wrapper():
+            return uuid7(seq_bits)
+
+        uuid_module = uuid7_wrapper
     elif uuid_version == "8":
 
         if args.custom_a is None or args.custom_b is None or args.custom_c is None:
