@@ -16,10 +16,10 @@ All drafts are supported for UUIDv6, UUIDv7, UUIDv8, Nil UUID, and Max UUID.
 
 ```sh
 # pip
-pip install newnewid-python
+pip install newnewid
 
 # poetry
-poetry add newnewid-python
+poetry add newnewid
 ```
 
 ## Usage

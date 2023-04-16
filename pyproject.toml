@@ -27,7 +27,7 @@ description = ""
 name = "newnewid"
 packages = [{from = "src", include = "newnewid"}]
 readme = "README.md"
-version = "0.4.3"
+version = "0.4.4"
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
