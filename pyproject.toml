@@ -27,7 +27,7 @@ description = ""
 name = "newnewid"
 packages = [{from = "src", include = "newnewid"}]
 readme = "README.md"
-version = "0.2.0"
+version = "0.3.0"
 
 [tool.poetry.dependencies]
 python = "^3.8.1"
@@ -39,5 +39,4 @@ pyproject-flake8 = "^6.0.0.post1"
 pytest = "^7.2.2"
 
 [tool.poetry.scripts]
-newnewid = "newnewid.cli:generate_uuid"
-uuidparse = "newnewid.cli:parse_uuid"
+newnewid = "newnewid.cli:cli"
