@@ -123,7 +123,7 @@ def cli():
 
     subparsers = parser.add_subparsers(required=True)
     gen_parser = subparsers.add_parser("generate", help="Generate UUID.")
-    gen_parser.set_defaults(func=generate_uuid)
+
     gen_parser.add_argument(
         "n",
         type=int,
@@ -182,16 +182,32 @@ def cli():
         default=None,
     )
 
+    def generate_uuid_wrapper(args):
+        try:
+            generate_uuid(args)
+        except Exception:
+            gen_parser.print_help()
+
+    gen_parser.set_defaults(func=generate_uuid_wrapper)
+
     parse_parser = subparsers.add_parser("parse", help="Parse UUID.")
-    parse_parser.set_defaults(func=parse_uuid)
     parse_parser.add_argument("uuid", nargs="+", type=str, help="UUID")
     parse_parser.add_argument(
+        "-m",
         "--method",
         nargs="?",
         type=str,
         help="Method for UUIDv7. 'METHOD-0', 'METHOD-1-12', 'METHOD-1-26', 'METHOD-1-42' or 'METHOD-2'. Default: 'METHOD-1-12'",
         default="METHOD-1-12",
     )
+
+    def parse_uuid_wrapper(args):
+        try:
+            parse_uuid(args)
+        except Exception:
+            parse_parser.print_help()
+
+    parse_parser.set_defaults(func=parse_uuid_wrapper)
 
     try:
         args = parser.parse_args()

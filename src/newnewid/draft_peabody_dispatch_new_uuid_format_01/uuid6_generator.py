@@ -84,10 +84,9 @@ class UUID6Generator(GregorianBasedUUIDGenerator):
         node = uuid.int & 0xFFFF_FFFF_FFFF
 
         gregorian_100_nano_seconds = (time_high << 28) | (time_mid << 12) | time_low
-        time, epoch_100_nano_fraction = UUIDClock.to_datetime_from_gregorian_100_nano_seconds(
+        time, epoch_nano_fraction = UUIDClock.to_datetime_from_gregorian_100_nano_seconds(
             gregorian_100_nano_seconds
         )
-        epoch_nano_fraction = epoch_100_nano_fraction * 100
 
         return {
             "time_high": time_high,

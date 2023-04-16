@@ -136,3 +136,10 @@ class TestSample:
         print("UUIDv8")
         print(uuid8)
         print("")
+
+    def test_parse_uuid(self):
+        import newnewid
+        from newnewid.parser.uuid_parser import parse
+
+        parsed = parse(newnewid.UUID("2cf1c828-dc02-11ed-b270-0242ac110002"))
+        print(f"parsed {parsed}")

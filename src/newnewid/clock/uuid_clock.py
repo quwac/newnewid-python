@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Tuple
 
 
@@ -157,9 +157,11 @@ class UUIDClock:
             Tuple[datetime, int]: Datetime and nanoseconds.
         """
         epoch_100_nano_seconds = gregorian_100_nano_seconds - cls.GREGORIAN_OFFSET
+        (seconds, fraction_nano) = divmod(epoch_100_nano_seconds * 100, 1_000_000_000)
+        (microseconds, fraction_nano) = divmod(fraction_nano, 1000)
         return (
-            datetime.fromtimestamp(epoch_100_nano_seconds / 10_000_000_000),
-            epoch_100_nano_seconds % 10_000_000_000,
+            datetime.fromtimestamp(seconds) + timedelta(microseconds=microseconds),
+            fraction_nano,
         )
 
     @classmethod
