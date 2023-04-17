@@ -1,8 +1,7 @@
 # noqa: E401
 import importlib
-from typing import Literal
 
-UUIDSpec = Literal[
+_SPECS = (
     "draft_peabody_dispatch_new_uuid_format_01",
     "draft_peabody_dispatch_new_uuid_format_02",
     "draft_peabody_dispatch_new_uuid_format_03",
@@ -10,30 +9,20 @@ UUIDSpec = Literal[
     "draft_ietf_uuidrev_rfc4122bis_00",
     "draft_ietf_uuidrev_rfc4122bis_01",
     "draft_ietf_uuidrev_rfc4122bis_02",
-    "latest",
-]
+    "draft_ietf_uuidrev_rfc4122bis_03",
+)
 
 
-def load_modules(spec: UUIDSpec = "latest"):
+def load_modules(spec: str = "latest"):
     """Load modules for the given spec.
 
     Args:
-        spec (UUIDSpec, optional): Specification to load. Defaults to "latest".
+        spec (str, optional): Specification to load. Defaults to "latest".
     """
-    if spec == "draft_peabody_dispatch_new_uuid_format_01":
-        module = importlib.import_module("newnewid.draft_peabody_dispatch_new_uuid_format_01")
-    elif spec == "draft_peabody_dispatch_new_uuid_format_02":
-        module = importlib.import_module("newnewid.draft_peabody_dispatch_new_uuid_format_02")
-    elif spec == "draft_peabody_dispatch_new_uuid_format_03":
-        module = importlib.import_module("newnewid.draft_peabody_dispatch_new_uuid_format_03")
-    elif spec == "draft_peabody_dispatch_new_uuid_format_04":
-        module = importlib.import_module("newnewid.draft_peabody_dispatch_new_uuid_format_04")
-    elif spec == "draft_ietf_uuidrev_rfc4122bis_00":
-        module = importlib.import_module("newnewid.draft_ietf_uuidrev_rfc4122bis_00")
-    elif spec == "draft_ietf_uuidrev_rfc4122bis_01":
-        module = importlib.import_module("newnewid.draft_ietf_uuidrev_rfc4122bis_01")
-    elif spec == "draft_ietf_uuidrev_rfc4122bis_02" or spec == "latest":
-        module = importlib.import_module("newnewid.draft_ietf_uuidrev_rfc4122bis_02")
+    if spec in _SPECS:
+        module = importlib.import_module(f"newnewid.{spec}")
+    elif "latest":
+        module = importlib.import_module(f"newnewid.{_SPECS[-1]}")
     else:
         raise ValueError(f"Unknown spec: {spec}")
 

@@ -1,5 +1,6 @@
+import math
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Dict, Optional, Tuple
 from uuid import UUID
 
@@ -12,22 +13,74 @@ from newnewid.uuidgenerator.clock_based_uuid_generator import ClockBasedUUIDGene
 
 
 @dataclass(frozen=True)
-class UUID7Option:
-    """Option for UUIDv7."""
+class CounterOption:
+    """Option for counter bits generation."""
 
     counter_bits_length: int
-    increment_bits_length: Optional[int]
+    max_increment_bits_length: int
+
+    def __post_init__(self):
+        assert (
+            0 < self.counter_bits_length <= 74
+        ), f"counter_bits_length must be 0 < x <= 74, not {self.counter_bits_length}"
+
+        assert self.max_increment_bits_length <= self.max_increment_bits_length, (
+            "max_increment_bits_length must be less than or equal to counter_bits_length, "
+            + f"not {self.max_increment_bits_length} > {self.counter_bits_length}"
+        )
+
+
+@dataclass(frozen=True)
+class RandomOption:
+    """Option for random bits generation."""
+
+    random_bits_length: int
+    rerandomize_until_monotonic: bool
 
     @nodoc
     def __post_init__(self):
         assert (
-            0 <= self.counter_bits_length <= 74
-        ), f"counter_bits_length must be between 0 and 74, not {self.counter_bits_length}"
+            self.random_bits_length > 0
+        ), f"random_bits_length must be greater than 0, not {self.random_bits_length}"
 
-        if self.increment_bits_length is not None:
-            assert (
-                self.increment_bits_length <= self.counter_bits_length
-            ), f"increment_bits_length must be equal or less than counter_bits_length, not {self.increment_bits_length}"
+
+@dataclass(frozen=True)
+class UUID7Option:
+    """Option for UUIDv7."""
+
+    time_fraction_bits_length: int
+    counter_option: Optional[CounterOption]
+    random_option: Optional[RandomOption]
+
+    @nodoc
+    def __post_init__(self):
+        all_bits_length = (
+            self.time_fraction_bits_length
+            + (self.counter_option.counter_bits_length if self.counter_option else 0)
+            + (self.random_option.random_bits_length if self.random_option else 0)
+        )
+
+        assert all_bits_length == 74, "all bits length must be 74"
+
+    @property
+    @nodoc
+    def counter_bits_length(self) -> int:
+        return self.counter_option.counter_bits_length if self.counter_option else 0
+
+    @property
+    @nodoc
+    def max_increment_bits_length(self) -> int:
+        return self.counter_option.max_increment_bits_length if self.counter_option else 0
+
+    @property
+    @nodoc
+    def random_bits_length(self) -> int:
+        return self.random_option.random_bits_length if self.random_option else 0
+
+    @property
+    @nodoc
+    def rerandomize_until_monotonic(self) -> bool:
+        return self.random_option.rerandomize_until_monotonic if self.random_option else False
 
     @classmethod
     def method_1_fixed_length_dedicated_counter_bits(
@@ -46,8 +99,15 @@ class UUID7Option:
         ), f"counter_bits_length must be between 12 and 42, not {counter_bits_length}"
 
         return cls(
-            counter_bits_length=counter_bits_length,
-            increment_bits_length=1,
+            time_fraction_bits_length=0,
+            counter_option=CounterOption(
+                counter_bits_length=counter_bits_length,
+                max_increment_bits_length=1,
+            ),
+            random_option=RandomOption(
+                random_bits_length=74 - counter_bits_length,
+                rerandomize_until_monotonic=False,
+            ),
         )
 
     @classmethod
@@ -66,12 +126,87 @@ class UUID7Option:
         ), f"increment_bits_length must be between 1 and 72, not {max_increment_bits_length}"
 
         return cls(
-            counter_bits_length=74,
-            increment_bits_length=max_increment_bits_length,
+            time_fraction_bits_length=0,
+            counter_option=CounterOption(
+                counter_bits_length=74,
+                max_increment_bits_length=max_increment_bits_length,
+            ),
+            random_option=None,
+        )
+
+    @classmethod
+    def method_3_rerandomize_until_monotonic(cls) -> "UUID7Option":
+        """Create option for UUIDv7 of method 3.
+
+        This implementation is provided for reference and my study.
+        The committed outputs of Method 2 and Method 3 are the same. For users of this package,
+        Method 3 has only the disadvantages of longer computation time and a tendency to rollover.
+
+        Returns:
+            UUID7Option: Option for UUIDv7 of method 3.
+        """
+        return cls(
+            time_fraction_bits_length=0,
+            counter_option=None,
+            random_option=RandomOption(
+                random_bits_length=74,
+                rerandomize_until_monotonic=True,
+            ),
+        )
+
+    @classmethod
+    def method_4_replace_left_most_random_bits_with_increased_clock_precision(
+        cls,
+        time_fraction_bits_length: int,
+        counter_bits_length: int,
+    ) -> "UUID7Option":
+        """Create option for UUIDv7 of method 4.
+
+        Args:
+            counter_bits_length (int): Counter value length in bits.
+            time_fraction_bits_length (int): Time fraction length in bits.
+
+        Returns:
+            UUID7Option: Option for UUIDv7 of method 1.
+        """
+        if counter_bits_length > 0:
+            assert (
+                12 <= counter_bits_length <= 42
+            ), f"counter_bits_length must be between 12 and 42, not {counter_bits_length}"
+            assert (
+                12 <= counter_bits_length + time_fraction_bits_length <= 74
+            ), f"counter_bits_length + time_fraction_bits_length must be between 12 and 74, not counter_bits_length={counter_bits_length}, time_fraction_bits_length={time_fraction_bits_length}"
+        else:
+            assert (
+                1 <= time_fraction_bits_length <= 74
+            ), f"time_fraction_bits_length must be between 1 and 74, not {counter_bits_length}"
+
+        if counter_bits_length == 0:
+            counter_option = None
+        else:
+            counter_option = CounterOption(
+                counter_bits_length=counter_bits_length,
+                max_increment_bits_length=1,
+            )
+
+        return cls(
+            time_fraction_bits_length=time_fraction_bits_length,
+            counter_option=counter_option,
+            random_option=RandomOption(
+                random_bits_length=74 - counter_bits_length - time_fraction_bits_length,
+                rerandomize_until_monotonic=False,
+            ),
         )
 
 
-METHOD_0_NO_COUNTER = UUID7Option(counter_bits_length=0, increment_bits_length=None)
+METHOD_0_NO_COUNTER = UUID7Option(
+    time_fraction_bits_length=0,
+    counter_option=None,
+    random_option=RandomOption(
+        random_bits_length=74,
+        rerandomize_until_monotonic=False,
+    ),
+)
 
 METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_12 = (
     UUID7Option.method_1_fixed_length_dedicated_counter_bits(
@@ -96,6 +231,19 @@ METHOD_2_MONOTONIC_RANDOM_62_BITS = UUID7Option.method_2_monotonic_random(
     max_increment_bits_length=62,
 )
 
+METHOD_3_RERANDOMIZE_UNTIL_MONOTONIC = UUID7Option.method_3_rerandomize_until_monotonic()
+
+METHOD_4_REPLACE_LEFT_MOST_RANDOM_BITS_WITH_INCREASED_CLOCK_PRECISION_12_BITS = (
+    UUID7Option.method_4_replace_left_most_random_bits_with_increased_clock_precision(
+        time_fraction_bits_length=12,
+        counter_bits_length=0,
+    )
+)
+
+METHOD_4_REPLACE_LEFT_MOST_RANDOM_BITS_WITH_INCREASED_CLOCK_PRECISION_12_BITS_WITH_COUNTER_14_BITS = UUID7Option.method_4_replace_left_most_random_bits_with_increased_clock_precision(
+    time_fraction_bits_length=12,
+    counter_bits_length=14,
+)
 
 _ULID_COMPATIBLE_OPTION = UUID7Option.method_2_monotonic_random(
     max_increment_bits_length=1,
@@ -173,57 +321,80 @@ class UUID7Generator(ClockBasedUUIDGenerator):
             )
 
         self._counter = Counter(
-            bits_length=uuid7_option.counter_bits_length,
-            max_increment_bits_length=uuid7_option.increment_bits_length,
+            counter_bits_length=uuid7_option.counter_bits_length,
+            max_increment_bits_length=uuid7_option.max_increment_bits_length,
             pseudo_random_generator=self._pseudo_random_generator,
             initial_timestamp=last_timestamp,
             initial_counter=last_counter,
         )
 
-        assert (
-            0 <= self._counter.bits_length <= 74
-        ), f"mask_bits_length must be between 0 and 74, not {self._counter.bits_length}"
-        self.rand_bits = 74 - self._counter.bits_length
+        self.time_fraction_bits_length = uuid7_option.time_fraction_bits_length
+        self.time_fraction_max = (
+            (1 << self.time_fraction_bits_length) if self.time_fraction_bits_length > 0 else 0
+        )
+
+        self.rand_bits_length = uuid7_option.random_bits_length
 
         self._pseudo_random_binary_generator = PseudoRandomBinaryGenerator(
-            self.rand_bits, self._pseudo_random_generator
+            self.rand_bits_length, self._pseudo_random_generator
+        )
+        self.rerandomize_until_monotonic = (
+            uuid7_option.rerandomize_until_monotonic
+            if uuid7_option.rerandomize_until_monotonic
+            else False
         )
 
     @nodoc
     def timestamp(self, clock: UUIDClock) -> int:
-        return clock.epoch_milli_seconds()
+        return clock.epoch_nano_seconds()
 
     @property
     @nodoc
     def clock_bits_length(self) -> int:
-        return 48
+        # unix_ts_ms is 48 and time_fraction may be 0 bits to 72 bits.
+        return 122
 
     @property
     @nodoc
     def least_seconds(self) -> float:
-        return 0.001
+        if self.time_fraction_bits_length == 0:
+            return 0.001
+        else:
+            return 0.000_000_001
 
     @nodoc
     def generate_impl(self, timestamp: int) -> UUID:
+        unix_ts_ms, fraction_nano = divmod(timestamp, 1_000_000)
+
         # 48 bits
-        unix_ts_ms = timestamp
+        unix_ts_ms &= 0xFFFF_FFFF_FFFF
 
         # 4 bits
         ver = 7
 
         # 0 bits - 74 bits
-        seq = self._counter.get_next(unix_ts_ms)
-        # 74 bits - 0 bits
-        node = self._pseudo_random_binary_generator.generate()
+        time_fraction = math.ceil(self.time_fraction_max * fraction_nano / 1_000_000) & (
+            self.time_fraction_max - 1
+        )
+        # 0 bits or 12 bits - 48 bits
+        seq = self._counter.get_next(timestamp)
+        # 0 bits - 74 bits
+        node = self._pseudo_random_binary_generator.generate(
+            monotonic=self.rerandomize_until_monotonic
+        )
 
         # 74 bits
-        seq_and_node = (seq << self.rand_bits) | node
+        randomize_section = (
+            (time_fraction << (self.rand_bits_length + self._counter.counter_bits_length))
+            | (seq << self.rand_bits_length)
+            | node
+        )
 
         # 12 bits = 74 - 62
-        rand_a = (seq_and_node >> 62) & 0x0FFF
+        rand_a = (randomize_section >> 62) & 0x0FFF
 
         # 62 bits
-        rand_b = seq_and_node & 0x3FFF_FFFF_FFFF_FFFF
+        rand_b = randomize_section & 0x3FFF_FFFF_FFFF_FFFF
 
         # 2 bits
         var = 0b10
@@ -259,9 +430,19 @@ class UUID7Generator(ClockBasedUUIDGenerator):
         rand_b = uuid.int & 0x3FFF_FFFF_FFFF_FFFF
 
         # 0 - 74 bits
-        seq, rand = cls._parse_counter_and_rand(rand_a, rand_b, uuid7_option)
+        time_fraction, seq, rand = cls._parse_from_random_section(rand_a, rand_b, uuid7_option)
 
-        time = datetime.fromtimestamp(unix_ts_ms / 1000)
+        unix_ts, milliseconds = divmod(unix_ts_ms, 1000)
+        time = datetime.fromtimestamp(unix_ts).replace(microsecond=milliseconds * 1000)
+
+        if time_fraction is not None:
+            micro_fraction, nano_fraction = divmod(
+                (time_fraction * 1_000_000) // (1 << uuid7_option.time_fraction_bits_length), 1000
+            )
+            time = time + timedelta(microseconds=micro_fraction)
+        else:
+            nano_fraction = None
+
         return {
             "unix_ts_ms": unix_ts_ms,
             "ver": "7",
@@ -269,31 +450,39 @@ class UUID7Generator(ClockBasedUUIDGenerator):
             "var": variant,
             "rand_b": rand_b,
             "time": time.isoformat(),
+            "nano_fraction": nano_fraction,
             "seq": seq,
             "rand": rand,
         }
 
     @classmethod
-    def _parse_counter_and_rand(
+    def _parse_from_random_section(
         cls,
         rand_a: int,
         rand_b: int,
         uuid7_option: UUID7Option,
-    ) -> Tuple[Optional[int], Optional[int]]:
-        seq_and_rand = (rand_a << 62) | rand_b
-        if uuid7_option.counter_bits_length == 0:
-            return None, seq_and_rand
-        elif uuid7_option.counter_bits_length == 74:
-            return seq_and_rand, None
+    ) -> Tuple[Optional[int], Optional[int], Optional[int]]:
+        random_section = (rand_a << 62) | rand_b
 
+        time_fraction_bits_length = uuid7_option.time_fraction_bits_length
+        time_fraction_mask = (1 << time_fraction_bits_length) - 1
+        counter_bits_length = uuid7_option.counter_bits_length
         seq_mask = (1 << uuid7_option.counter_bits_length) - 1
-        rand_bits = 74 - uuid7_option.counter_bits_length
+        rand_bits = uuid7_option.random_bits_length
         rand_mask = (1 << rand_bits) - 1
 
-        seq = (seq_and_rand >> rand_bits) & seq_mask
-        rand = seq_and_rand & rand_mask
+        time_fraction = (random_section >> (counter_bits_length + rand_bits)) & time_fraction_mask
+        seq = (random_section >> rand_bits) & seq_mask
+        rand = random_section & rand_mask
 
-        return seq, rand
+        if uuid7_option.time_fraction_bits_length == 0:
+            time_fraction = None
+        if uuid7_option.counter_bits_length == 0:
+            seq = None
+        elif uuid7_option.random_bits_length == 0:
+            rand = None
+
+        return time_fraction, seq, rand
 
     @classmethod
     def _parse_last_uuid(
@@ -303,13 +492,20 @@ class UUID7Generator(ClockBasedUUIDGenerator):
     ) -> Tuple[int, Optional[int]]:
         parsed = cls.parse(last_uuid, uuid7_option)
         unix_ts_ms: int = parsed["unix_ts_ms"]
-        counter, _ = cls._parse_counter_and_rand(
+        time_fraction, counter, _ = cls._parse_from_random_section(
             rand_a=parsed["rand_a"],
             rand_b=parsed["rand_b"],
             uuid7_option=uuid7_option,
         )
 
-        return (unix_ts_ms, counter)
+        if time_fraction is not None and uuid7_option.time_fraction_bits_length is not None:
+            timestamp = unix_ts_ms * 1_000_000 + time_fraction // (
+                1 << uuid7_option.time_fraction_bits_length
+            )
+        else:
+            timestamp = unix_ts_ms
+
+        return (timestamp, counter)
 
 
 _option_to_uuid7_generator: Dict[UUID7Option, UUID7Generator] = {}

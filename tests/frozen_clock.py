@@ -1,26 +1,18 @@
+from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Optional
+from typing import List, Optional
 
 from newnewid.clock.uuid_clock import UUIDClock
 
 
-class FrozenClock(UUIDClock):
-    @classmethod
-    def from_datetime(cls, datetime: datetime, nanosecond_fraction: int = 0) -> "FrozenClock":
-        return cls(
-            year=datetime.year,
-            month=datetime.month,
-            day=datetime.day,
-            hour=datetime.hour,
-            minute=datetime.minute,
-            second=datetime.second,
-            microsecond=datetime.microsecond,
-            nanosecond_fraction=nanosecond_fraction,
-            tzinfo=datetime.tzinfo,  # type: ignore
-        )
+@dataclass(frozen=True)
+class NanoDateTime:
+    datetime: datetime
+    nanosecond_fraction: int
 
-    def __init__(
-        self,
+    @classmethod
+    def from_raw(
+        cls,
         year: int,
         month: int,
         day: int,
@@ -30,9 +22,11 @@ class FrozenClock(UUIDClock):
         microsecond: int = 0,
         nanosecond_fraction: int = 0,
         tzinfo: Optional[timezone] = None,
-    ) -> None:
+    ) -> "NanoDateTime":
+        assert 0 <= microsecond <= 999_999
+        assert 0 <= nanosecond_fraction <= 999
+
         tzinfo = tzinfo or timezone.utc
-        super().__init__()
         dt_epoch_time = datetime(
             year=year,
             month=month,
@@ -40,13 +34,62 @@ class FrozenClock(UUIDClock):
             hour=hour,
             minute=minute,
             second=second,
+            microsecond=microsecond,
             tzinfo=tzinfo,
         )
-        self._time_ns = (
-            int(dt_epoch_time.timestamp()) * 1_000_000_000
-            + microsecond * 1_000
-            + nanosecond_fraction
+        return NanoDateTime(dt_epoch_time, nanosecond_fraction)
+
+    @property
+    def time_ns(self) -> int:
+        return (
+            int(self.datetime.timestamp()) * 1_000_000_000
+            + self.datetime.microsecond * 1_000
+            + self.nanosecond_fraction
         )
 
-    def time_ns(self) -> int:
-        return self._time_ns
+
+class FrozenClock(UUIDClock):
+    @classmethod
+    def from_nano_datetime(cls, nano_datetime: NanoDateTime) -> "FrozenClock":
+        return cls([nano_datetime])
+
+    @classmethod
+    def from_raw(
+        cls,
+        year: int,
+        month: int,
+        day: int,
+        hour: int,
+        minute: int,
+        second: int,
+        microsecond: int = 0,
+        nanosecond_fraction: int = 0,
+        tzinfo: Optional[timezone] = None,
+    ) -> "FrozenClock":
+        assert 0 <= microsecond <= 999_999
+        assert 0 <= nanosecond_fraction <= 999
+
+        tzinfo = tzinfo or timezone.utc
+        dt_epoch_time = datetime(
+            year=year,
+            month=month,
+            day=day,
+            hour=hour,
+            minute=minute,
+            second=second,
+            microsecond=microsecond,
+            tzinfo=tzinfo,
+        )
+        return cls([NanoDateTime(dt_epoch_time, nanosecond_fraction)])
+
+    def __init__(
+        self,
+        nano_datetimes: List[NanoDateTime],
+    ) -> None:
+        super().__init__()
+        self._nano_datetimes = nano_datetimes
+        self.index = -1
+
+    def epoch_nano_seconds(self) -> int:
+        self.index = (self.index + 1) % len(self._nano_datetimes)
+        return self._nano_datetimes[self.index].time_ns
