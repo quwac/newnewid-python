@@ -392,7 +392,7 @@ print("")
 
 * [uuid6/prototypes](https://github.com/uuid6/prototypes)
 
-## Appendix 1: UUIDv7 (>= draft-peabody-dispatch-new-uuid-format-03, <= draft-ietf-uuidrev-rfc4122bis-02) implementation
+## Appendix: UUIDv7 (>= draft-peabody-dispatch-new-uuid-format-03) implementation
 
 ### `rand_a` and `rand_b` flexibility
 
