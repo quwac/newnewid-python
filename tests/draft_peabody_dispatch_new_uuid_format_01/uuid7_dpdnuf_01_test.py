@@ -14,7 +14,7 @@ class TestUUID7Dpdnuf01:
         assert uuid.variant == RFC_4122
 
     def test_uuid7_generator_milli(self):
-        clock = FrozenClock(
+        clock = FrozenClock.from_raw(
             year=2021,
             month=8,
             day=11,
@@ -42,7 +42,7 @@ class TestUUID7Dpdnuf01:
         )
 
     def test_uuid6_generator_micro(self):
-        clock = FrozenClock(
+        clock = FrozenClock.from_raw(
             2021,
             8,
             11,
@@ -69,7 +69,7 @@ class TestUUID7Dpdnuf01:
         )
 
     def test_uuid6_generator_nano(self):
-        clock = FrozenClock(
+        clock = FrozenClock.from_raw(
             year=2021,
             month=8,
             day=11,

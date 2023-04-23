@@ -59,7 +59,7 @@ class GregorianBasedUUIDGenerator(ClockBasedUUIDGenerator, metaclass=ABCMeta):
             last_counter = parsed["clock_seq"]
 
         self._counter = Counter(
-            bits_length=14,
+            counter_bits_length=14,
             max_increment_bits_length=1,
             pseudo_random_generator=self._pseudo_random_generator,
             initial_timestamp=last_timestamp,

@@ -8,14 +8,6 @@ class UUIDClock:
 
     GREGORIAN_OFFSET = 0x1B2_1DD_213_814_000
 
-    def time_ns(self) -> int:
-        """Get time in nanoseconds.
-
-        Returns:
-            int: Epoch time in nanoseconds.
-        """
-        return time.time_ns()
-
     # ----------------------------
     # epoch_*_seconds
     # ----------------------------
@@ -26,7 +18,7 @@ class UUIDClock:
         Returns:
             int: Epoch time in seconds.
         """
-        return self.time_ns() // 1_000_000_000
+        return self.epoch_nano_seconds() // 1_000_000_000
 
     def epoch_milli_seconds(self) -> int:
         """Get time in milliseconds.
@@ -34,7 +26,15 @@ class UUIDClock:
         Returns:
             int: Epoch time in milliseconds.
         """
-        return self.time_ns() // 1_000_000
+        return self.epoch_nano_seconds() // 1_000_000
+
+    def epoch_nano_seconds(self) -> int:
+        """Get time in nanoseconds.
+
+        Returns:
+            int: Epoch time in nanoseconds.
+        """
+        return time.time_ns()
 
     def epoch_100_nano_seconds(self) -> int:
         """Get time in 100 nanoseconds.
@@ -42,7 +42,7 @@ class UUIDClock:
         Returns:
             int: Epoch time in 100 nanoseconds.
         """
-        return self.time_ns() // 100
+        return self.epoch_nano_seconds() // 100
 
     # ----------------------------
     # gregorian
@@ -54,7 +54,7 @@ class UUIDClock:
         Returns:
             int: Time in 100 nanoseconds since Gregorian epoch.
         """
-        return self.time_ns() // 100 + self.GREGORIAN_OFFSET
+        return self.epoch_nano_seconds() // 100 + self.GREGORIAN_OFFSET
 
     # ----------------------------
     # epoch_36_bits_seconds_with_*_bits_*_seconds
@@ -66,7 +66,7 @@ class UUIDClock:
         Returns:
             int: Time in 12 bits milliseconds since epoch.
         """
-        seconds, milli_part = divmod(self.time_ns() // 1_000_000, 1_000)
+        seconds, milli_part = divmod(self.epoch_nano_seconds() // 1_000_000, 1_000)
         return ((seconds & 0x000F_FFFF_FFFF) << 12) | milli_part
 
     def epoch_36_bits_seconds_with_24_bits_micro_seconds(self) -> int:
@@ -75,7 +75,7 @@ class UUIDClock:
         Returns:
             int: Time in 24 bits microseconds since epoch.
         """
-        seconds, micro_part = divmod(self.time_ns() // 1_000, 1_000_000)
+        seconds, micro_part = divmod(self.epoch_nano_seconds() // 1_000, 1_000_000)
         return ((seconds & 0x000F_FFFF_FFFF) << 24) | micro_part
 
     def epoch_36_bits_seconds_with_38_bits_nano_seconds(self) -> int:
@@ -84,7 +84,7 @@ class UUIDClock:
         Returns:
             int: Time in 38 bits nanoseconds since epoch.
         """
-        seconds, nano_part = divmod(self.time_ns(), 1_000_000_000)
+        seconds, nano_part = divmod(self.epoch_nano_seconds(), 1_000_000_000)
         return ((seconds & 0x000F_FFFF_FFFF) << 38) | nano_part
 
     # ----------------------------

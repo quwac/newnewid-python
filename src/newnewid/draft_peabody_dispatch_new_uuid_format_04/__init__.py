@@ -11,6 +11,7 @@ from newnewid.draft_peabody_dispatch_new_uuid_format_03.max_uuid_generator impor
 from newnewid.draft_peabody_dispatch_new_uuid_format_03.uuid7_generator import (
     METHOD_0_NO_COUNTER,
     METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_12,
+    METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_26,
     METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_42,
     METHOD_2_MONOTONIC_RANDOM_62_BITS,
     UUID7Generator,
@@ -24,7 +25,6 @@ from newnewid.draft_peabody_dispatch_new_uuid_format_03.uuid8_generator import (
 )
 from newnewid.exception.backward_uuid_exception import BackwardUUIDException
 from newnewid.random.pseudo_random_binary_generator import PseudoRandomBinaryGenerator
-from newnewid.util.specloader import UUIDSpec
 from newnewid.uuidgenerator.gregorian_based_uuid_generator import MacAddressGenerator
 from newnewid.uuidgenerator.uuid_generator import UUIDGenerator
 
@@ -36,6 +36,7 @@ __all__ = [
     "MaxUUIDGenerator",
     "METHOD_0_NO_COUNTER",
     "METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_12",
+    "METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_26",
     "METHOD_1_FIXED_LENGTH_DEDICATED_COUNTER_BITS_42",
     "METHOD_2_MONOTONIC_RANDOM_62_BITS",
     "PseudoRandomBinaryGenerator",
@@ -49,5 +50,4 @@ __all__ = [
     "UUID8Generator",
     "UUIDClock",
     "UUIDGenerator",
-    "UUIDSpec",
 ]

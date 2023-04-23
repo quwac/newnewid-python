@@ -48,7 +48,6 @@ from newnewid.draft_peabody_dispatch_new_uuid_format_03.uuid8_generator import (
 from newnewid.exception.backward_uuid_exception import BackwardUUIDException
 from newnewid.random.pseudo_random_binary_generator import PseudoRandomBinaryGenerator
 from newnewid.random.pseudo_random_generator import PseudoRandomGenerator
-from newnewid.util.specloader import UUIDSpec
 from newnewid.uuidgenerator.gregorian_based_uuid_generator import MacAddressGenerator
 from newnewid.uuidgenerator.uuid_generator import UUIDGenerator
 
@@ -93,6 +92,5 @@ __all__ = [
     "Counter",
     "UUIDClock",
     "PseudoRandomGenerator",
-    "UUIDSpec",
     "MacAddressGenerator",
 ]

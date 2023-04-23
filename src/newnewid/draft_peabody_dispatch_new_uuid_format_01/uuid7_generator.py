@@ -100,7 +100,7 @@ class UUID7Generator(ClockBasedUUIDGenerator):
             (last_timestamp, last_counter) = self.__class__._parse_last_uuid(last_uuid, precision)
 
         self._counter = Counter(
-            bits_length=self.cbl,
+            counter_bits_length=self.cbl,
             max_increment_bits_length=1,
             pseudo_random_generator=self._pseudo_random_generator,
             initial_timestamp=last_timestamp,

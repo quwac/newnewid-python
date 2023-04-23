@@ -2,11 +2,17 @@ from datetime import datetime
 
 from assert_uuid import assert_uuid
 from const import TEST_CLOCK
-from frozen_clock import FrozenClock
+from frozen_clock import FrozenClock, NanoDateTime
 from frozen_pseudo_random_generator import FrozenPseudoRandomGenerator
 
 import newnewid
-from newnewid import UUID, UUID7Option
+from newnewid import (
+    METHOD_3_RERANDOMIZE_UNTIL_MONOTONIC,
+    METHOD_4_REPLACE_LEFT_MOST_RANDOM_BITS_WITH_INCREASED_CLOCK_PRECISION_12_BITS,
+    METHOD_4_REPLACE_LEFT_MOST_RANDOM_BITS_WITH_INCREASED_CLOCK_PRECISION_12_BITS_WITH_COUNTER_14_BITS,
+    UUID,
+    UUID7Option,
+)
 
 
 class TestUUID7:
@@ -15,23 +21,7 @@ class TestUUID7:
         assert uuid.version == 7
         assert uuid.variant == newnewid.RFC_4122
 
-    def test_uuid7_generator(self):
-        cbl = 12
-        pseudo_random_generator = FrozenPseudoRandomGenerator(
-            counter_reset=3267,
-            random_binary=1784793296645077391,
-        )
-        uuid7_option = UUID7Option.method_1_fixed_length_dedicated_counter_bits(cbl)
-        generator = newnewid.UUID7Generator(
-            uuid7_option=uuid7_option,
-            clock=TEST_CLOCK,
-            pseudo_random_generator=pseudo_random_generator,
-        )
-        actual = generator.generate()
-        expected = UUID("017F22E2-79B0-7CC3-98C4-DC0C0C07398F")
-        assert_uuid(actual, expected, newnewid.UUID7Generator, uuid7_option=uuid7_option)
-
-    def test_uuid7_monocity(self):
+    def test_uuid7_method1_12(self):
         cbl = 12
         pseudo_random_generator = FrozenPseudoRandomGenerator(
             counter_reset=3267,
@@ -58,7 +48,7 @@ class TestUUID7:
             uuid7_option=uuid7_option,
         )
 
-    def test_uuid7s(self):
+    def test_uuid7_method_1_26(self):
         cbl = 26
         test_cases = [
             {
@@ -149,7 +139,7 @@ class TestUUID7:
         for test_case in test_cases:
             expected = UUID(test_case["uuid"])
             time = datetime.fromisoformat(test_case["time"])
-            clock = FrozenClock.from_datetime(time)
+            clock = FrozenClock.from_nano_datetime(NanoDateTime(time, 0))
             pseudo_random_generator = FrozenPseudoRandomGenerator(
                 counter_reset=int(test_case["seq"]), random_binary=int(test_case["rand"])
             )
@@ -161,3 +151,150 @@ class TestUUID7:
             )
             actual = generator.generate()
             assert_uuid(actual, expected, newnewid.UUID7Generator)
+
+    def test_uuid7_method_2_62(self):
+        pseudo_random_generator = FrozenPseudoRandomGenerator(
+            counter_reset=3582500046746685589207, counter_increment=263884065636370560438
+        )
+        uuid7_option = UUID7Option.method_2_monotonic_random(62)
+        generator = newnewid.UUID7Generator(
+            uuid7_option=uuid7_option,
+            clock=TEST_CLOCK,
+            pseudo_random_generator=pseudo_random_generator,
+        )
+        actual1 = generator.generate()
+        assert_uuid(
+            actual1,
+            UUID("017F22E2-79B0-7308-B52C-EB9E0C80C6D7"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+        actual2 = generator.generate()
+        assert_uuid(
+            actual2,
+            UUID("017F22E2-79B0-7342-834D-73322A3BFC8D"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+
+    def test_uuid7_method_3(self):
+        pseudo_random_generator = FrozenPseudoRandomGenerator(
+            random_binary=[3582500046746685589207, 3582500046746685589206, 3846384112383056149645]
+        )
+        uuid7_option = METHOD_3_RERANDOMIZE_UNTIL_MONOTONIC
+        generator = newnewid.UUID7Generator(
+            uuid7_option=uuid7_option,
+            clock=TEST_CLOCK,
+            pseudo_random_generator=pseudo_random_generator,
+        )
+        actual1 = generator.generate()
+        assert_uuid(
+            actual1,
+            UUID("017F22E2-79B0-7308-B52C-EB9E0C80C6D7"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+        actual2 = generator.generate()
+        assert_uuid(
+            actual2,
+            UUID("017F22E2-79B0-7342-834D-73322A3BFC8D"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+
+    def test_uuid7_method_4_without_counter(self):
+        pseudo_random_generator = FrozenPseudoRandomGenerator(
+            random_binary=[3521272293113388459, 33447269696974427]
+        )
+        uuid7_option = METHOD_4_REPLACE_LEFT_MOST_RANDOM_BITS_WITH_INCREASED_CLOCK_PRECISION_12_BITS
+        generator = newnewid.UUID7Generator(
+            uuid7_option=uuid7_option,
+            clock=FrozenClock(
+                [
+                    NanoDateTime.from_raw(
+                        2023,
+                        4,
+                        23,
+                        9,
+                        24,
+                        55,
+                        858212,
+                        646,
+                    ),
+                    NanoDateTime.from_raw(
+                        2023,
+                        4,
+                        23,
+                        9,
+                        24,
+                        55,
+                        858244,
+                        628,
+                    ),
+                ]
+            ),
+            pseudo_random_generator=pseudo_random_generator,
+        )
+        actual1 = generator.generate()
+        assert_uuid(
+            actual1,
+            UUID("0187ad6e-3db2-7367-b0de-127e7c72ddab"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+        actual2 = generator.generate()
+        assert_uuid(
+            actual2,
+            UUID("0187ad6e-3db2-73ea-8076-d41d54feae5b"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+
+    def test_uuid7_method_4_with_counter(self):
+        pseudo_random_generator = FrozenPseudoRandomGenerator(
+            counter_reset=[5183, 4209],
+            random_binary=[185252732552862, 35084825383831],
+        )
+        uuid7_option = METHOD_4_REPLACE_LEFT_MOST_RANDOM_BITS_WITH_INCREASED_CLOCK_PRECISION_12_BITS_WITH_COUNTER_14_BITS
+        generator = newnewid.UUID7Generator(
+            uuid7_option=uuid7_option,
+            clock=FrozenClock(
+                [
+                    NanoDateTime.from_raw(
+                        2023,
+                        4,
+                        23,
+                        11,
+                        38,
+                        52,
+                        147397,
+                        705,
+                    ),
+                    NanoDateTime.from_raw(
+                        2023,
+                        4,
+                        23,
+                        11,
+                        38,
+                        52,
+                        147430,
+                        175,
+                    ),
+                ]
+            ),
+            pseudo_random_generator=pseudo_random_generator,
+        )
+        actual1 = generator.generate()
+        assert_uuid(
+            actual1,
+            UUID("0187ade8-dd73-765d-943f-a87c8351469e"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )
+        actual2 = generator.generate()
+        assert_uuid(
+            actual2,
+            UUID("0187ade8-dd73-76e2-9071-1fe8d28dd397"),
+            newnewid.UUID7Generator,
+            uuid7_option=uuid7_option,
+        )

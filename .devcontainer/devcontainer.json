@@ -26,26 +26,34 @@
                     ],
                     "editor.formatOnSave": true
                 },
-                "python.linting.flake8Path": ".venv/bin/pflake8",
                 "isort.args": [
                     "--profile",
                     "black"
-                ]
+                ],
+                "python.linting.flake8Path": "${workspaceFolder}/.venv/bin/pflake8",
+                "python.testing.pytestArgs": [
+                    "tests"
+                ],
+                "python.testing.pytestEnabled": true,
+                "python.testing.unittestEnabled": false
             },
             "extensions": [
-				"ms-python.python",
-				"njpwerner.autodocstring",
-				"ms-python.black-formatter",
-				"be5invis.toml",
-				"tamasfe.even-better-toml",
-				"bungcip.better-toml",
-				"ms-python.isort",
-				"redhat.vscode-yaml",
-				"tehnix.vscode-tidymarkdown",
-				"yzhang.markdown-all-in-one",
-				"DavidAnson.vscode-markdownlint",
-				"ms-azuretools.vscode-docker"
-			]
+                "ms-python.python",
+                "njpwerner.autodocstring",
+                "ms-python.black-formatter",
+                "be5invis.toml",
+                "tamasfe.even-better-toml",
+                "bungcip.better-toml",
+                "ms-python.isort",
+                "redhat.vscode-yaml",
+                "tehnix.vscode-tidymarkdown",
+                "yzhang.markdown-all-in-one",
+                "DavidAnson.vscode-markdownlint",
+                "ms-azuretools.vscode-docker",
+                "ms-vscode.live-server",
+                "GitHub.copilot",
+                "maziac.hex-hover-converter"
+            ]
         }
     }
     // 👇 Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.

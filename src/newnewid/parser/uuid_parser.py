@@ -2,7 +2,7 @@ from typing import Any, Dict
 from uuid import UUID
 
 from newnewid.clock.uuid_clock import UUIDClock
-from newnewid.util.specloader import UUIDSpec, load_modules
+from newnewid.util.specloader import load_modules
 from newnewid.uuidgenerator.uuid_generator import UUIDGenerator
 
 
@@ -161,12 +161,12 @@ class _OtherUUIDParser:
         }
 
 
-def parse(uuid: UUID, spec: UUIDSpec = "latest", **kwargs) -> Dict[str, Any]:
+def parse(uuid: UUID, spec: str = "latest", **kwargs) -> Dict[str, Any]:
     """Parse UUID.
 
     Args:
         uuid (UUID): UUID.
-        spec (UUIDSpec, optional): UUID spec. Defaults to "latest".
+        spec (str, optional): UUID spec. Defaults to "latest".
 
     Returns:
         Dict[str, Any]: Parsed UUID.
